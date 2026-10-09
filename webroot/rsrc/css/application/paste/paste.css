@@ -31,3 +31,9 @@
   border-top-right-radius: 0;
   border-top-left-radius: 0;
 }
+
+/* Applied by the shared embed renderer in every application. */
+.paste-embed-body.paste-embed-expanded {
+  max-height: none !important;
+  overflow-y: visible;
+}

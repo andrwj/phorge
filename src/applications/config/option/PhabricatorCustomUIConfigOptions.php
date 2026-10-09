@@ -41,6 +41,8 @@ final class PhabricatorCustomUIConfigOptions
         'Files document text size in pixels (8 to 72).'),
       'ui.custom.document-font-size.windows-offset' => array('int', 1,
         'Additional pixels for document text on Windows (0 to 10).'),
+      'ui.custom.paste.expand-embeds' => array('bool', true,
+        'Remove Paste embed height limits in all applications.'),
     );
     $options = array();
     foreach ($specs as $key => $spec) {

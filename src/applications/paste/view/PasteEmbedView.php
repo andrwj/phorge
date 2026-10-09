@@ -50,7 +50,9 @@ final class PasteEmbedView extends AphrontView {
       $link);
 
     $body_attributes = array('class' => 'paste-embed-body');
-    if ($this->lines != null) {
+    if (PhabricatorEnv::getEnvConfig('ui.custom.paste.expand-embeds')) {
+      $body_attributes['class'] .= ' paste-embed-expanded';
+    } else if ($this->lines != null) {
       $body_attributes['style'] = 'max-height: '.$this->lines * (1.15).'em;';
     }
 

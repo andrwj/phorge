@@ -67,4 +67,26 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     $this->assertFalse(strpos($html, 'font-size: 16px;') !== false);
   }
 
+  public function testPasteEmbedExpansion() {
+    $env = PhabricatorEnv::beginScopedEnv();
+    $paste = id(new PhabricatorPaste())
+      ->setID(123)
+      ->attachContent(implode("\n", array_fill(0, 60, 'example')));
+    $handle = id(new PhabricatorObjectHandle())->setName('Example Paste');
+    $view = id(new PasteEmbedView())
+      ->setPaste($paste)
+      ->setHandle($handle)
+      ->setLines(2);
+
+    $env->overrideEnvConfig('ui.custom.paste.expand-embeds', true);
+    $html = (string)$view->render();
+    $this->assertTrue(strpos($html, 'paste-embed-expanded') !== false);
+    $this->assertFalse(strpos($html, 'max-height:') !== false);
+
+    $env->overrideEnvConfig('ui.custom.paste.expand-embeds', false);
+    $html = (string)$view->render();
+    $this->assertFalse(strpos($html, 'paste-embed-expanded') !== false);
+    $this->assertTrue(strpos($html, 'max-height: 2.3em;') !== false);
+  }
+
 }

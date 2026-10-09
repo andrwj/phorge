@@ -90,7 +90,7 @@ final class PhabricatorConfigSettingsListController
     $search_form = null;
     $search_error = null;
     if (PhabricatorEnv::getEnvConfig('ui.custom.search.config-settings')) {
-      $search_text = $request->getStr('query');
+      $search_text = $request->getStr('query', '');
       $search_form = id(new AphrontFormView())
         ->setUser($viewer)
         ->setMethod('GET')

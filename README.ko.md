@@ -31,6 +31,8 @@
 
 Config Settings 검색에는 실제 설정값·default·example 값을 포함하지 않습니다. Home dashboard option의 `0`은 기본 Home이며, 기존 menu의 explicit default 선택을 우선합니다.
 
+Settings 페이지에서 검색어가 없는 요청은 빈 문자열로 처리하여 PHP 8.3의 `trim(null)` deprecation을 방지합니다.
+
 설정은 application directory에서 `./bin/config get <key>`와 `./bin/config set <key> <value>`로 확인·변경합니다.
 
 ## Saffron Ink

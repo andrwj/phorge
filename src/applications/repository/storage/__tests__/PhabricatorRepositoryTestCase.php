@@ -3,6 +3,28 @@
 final class PhabricatorRepositoryTestCase
   extends PhabricatorTestCase {
 
+  public function testConfiguredDefaultBranch() {
+    $env = PhabricatorEnv::beginScopedEnv();
+    $env->overrideEnvConfig('repository.default-git-branch', 'main');
+    $repo = id(new PhabricatorRepository())
+      ->setVersionControlSystem(PhabricatorRepositoryType::REPOSITORY_TYPE_GIT);
+    $this->assertEqual('main', $repo->getDefaultBranch());
+    $this->assertEqual('main', $repo->getDefaultArcanistBranch());
+    $repo->setDetail('default-branch', 'release');
+    $this->assertEqual('release', $repo->getDefaultBranch());
+    $env->overrideEnvConfig('repository.default-git-branch', 'trunk');
+    $this->assertEqual('release', $repo->getDefaultBranch());
+    $repo->setDetail('default-branch', '');
+    $this->assertEqual('trunk', $repo->getDefaultBranch());
+    $repo->setVersionControlSystem(
+      PhabricatorRepositoryType::REPOSITORY_TYPE_MERCURIAL);
+    $this->assertEqual('default', $repo->getDefaultBranch());
+    $repo->setVersionControlSystem(
+      PhabricatorRepositoryType::REPOSITORY_TYPE_SVN);
+    $this->assertEqual(null, $repo->getDefaultBranch());
+    $this->assertEqual('svn', $repo->getDefaultArcanistBranch());
+  }
+
   public function testRepositoryURIProtocols() {
     $tests = array(
       '/path/to/repo'               => 'file',

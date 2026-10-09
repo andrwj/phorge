@@ -25,6 +25,10 @@ final class PhabricatorRepositoryConfigOptions
 
   public function getOptions() {
     return array(
+      $this->newOption('repository.default-git-branch', 'string', 'master')
+        ->setSummary(pht('Default Git branch when no repository override is set.'))
+        ->setDescription(pht(
+          'Repository-specific default branch settings take priority.')),
       $this->newOption('repository.default-local-path', 'string', '/var/repo/')
         ->setLocked(true)
         ->setSummary(
@@ -37,6 +41,17 @@ final class PhabricatorRepositoryConfigOptions
             'full of data you care about.',
             PlatformSymbols::getPlatformServerName())),
     );
+  }
+
+  protected function didValidateOption(
+    PhabricatorConfigOption $option,
+    $value) {
+    if ($option->getKey() === 'repository.default-git-branch' &&
+        (!phutil_nonempty_string($value) || trim($value) !== $value ||
+         preg_match('/[\x00-\x20\x7f]/', $value))) {
+      throw new PhabricatorConfigValidationException(
+        pht('Enter a nonempty Git branch name without whitespace.'));
+    }
   }
 
 }

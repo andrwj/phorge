@@ -874,7 +874,8 @@ final class PhabricatorRepository extends PhabricatorRepositoryDAO
     }
 
     $default_branches = array(
-      PhabricatorRepositoryType::REPOSITORY_TYPE_GIT        => 'master',
+      PhabricatorRepositoryType::REPOSITORY_TYPE_GIT =>
+        PhabricatorEnv::getEnvConfig('repository.default-git-branch'),
       PhabricatorRepositoryType::REPOSITORY_TYPE_MERCURIAL  => 'default',
     );
 

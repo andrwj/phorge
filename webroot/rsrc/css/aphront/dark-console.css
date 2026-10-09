@@ -6,7 +6,7 @@
   background: #444444;
   color: #eeeeee;
   width: 100%;
-  font-family: "Verdana";
+  font-family: var(--phabricator-font-ui, "Verdana");
   font-size: 11px;
   position: relative;
 }
@@ -100,7 +100,7 @@
 
 .dark-console .aphront-table-view th {
   text-shadow: none;
-  font-family: "Verdana";
+  font-family: var(--phabricator-font-ui, "Verdana");
   font-size: 11px;
   background: #333333;
   color: #ffffff;

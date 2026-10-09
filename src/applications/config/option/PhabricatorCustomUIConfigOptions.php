@@ -29,6 +29,10 @@ final class PhabricatorCustomUIConfigOptions
         'Enable Ctrl + mouse drag scrolling on Workboards.'),
       'ui.custom.search.collapsible-filters' => array('bool', true,
         'Collapse global advanced search filters by default.'),
+      'ui.custom.fonts.enabled' => array('bool', true,
+        'Enable custom font families and per-user font family preferences.'),
+      'ui.custom.fonts.ui-family' => array('string', '',
+        'Default interface font family list. User preferences take priority.'),
     );
     $options = array();
     foreach ($specs as $key => $spec) {
@@ -45,6 +49,12 @@ final class PhabricatorCustomUIConfigOptions
       return;
     }
     $key = $option->getKey();
+    if ($key === 'ui.custom.fonts.ui-family') {
+      if ($value !== '' &&
+          !PhabricatorFontFamilySetting::isValidFontFamily($value)) {
+        throw new PhabricatorConfigValidationException(pht('Enter a valid comma-separated font family list.'));
+      }
+    }
     $ranges = array(
     );
     if (isset($ranges[$key])) {

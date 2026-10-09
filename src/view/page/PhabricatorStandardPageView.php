@@ -408,12 +408,32 @@ final class PhabricatorStandardPageView extends PhabricatorBarePageView
         $monospaced);
     }
 
+    $custom_css = $this->newCustomUIStyle();
+
     return hsprintf(
-      '%s%s%s%s',
+      '%s%s%s%s%s',
       parent::getHead(),
       $font_css,
+      $custom_css,
       phutil_implode_html('', $this->headItems),
       $response->renderSingleResource('javelin-magical-init', 'phabricator'));
+  }
+
+  private function newCustomUIStyle() {
+    $custom_rules = array();
+    $request = $this->getRequest();
+    if ($request && PhabricatorEnv::getEnvConfig('ui.custom.fonts.enabled')) {
+      $value = $request->getUser()->getUserSetting(
+        PhabricatorVariableWidthFontSetting::SETTINGKEY);
+      if (!PhabricatorFontFamilySetting::isValidFontFamily($value)) {
+        $value = PhabricatorEnv::getEnvConfig('ui.custom.fonts.ui-family');
+      }
+      if (PhabricatorFontFamilySetting::isValidFontFamily($value)) {
+        $custom_rules[] = ':root { --phabricator-font-ui: '.$value.'; }';
+      }
+    }
+    return hsprintf('<style type="text/css">%s</style>',
+      new PhutilSafeHTML(implode("\n", $custom_rules)));
   }
 
   public function setGlyph($glyph) {

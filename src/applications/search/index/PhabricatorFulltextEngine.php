@@ -4,6 +4,7 @@ abstract class PhabricatorFulltextEngine
   extends Phobject {
 
   private $object;
+  private $viewer;
 
   public function setObject($object) {
     $this->object = $object;
@@ -15,7 +16,20 @@ abstract class PhabricatorFulltextEngine
   }
 
   protected function getViewer() {
-    return PhabricatorUser::getOmnipotentUser();
+    return $this->viewer ?: PhabricatorUser::getOmnipotentUser();
+  }
+
+  public function newSearchDocument(PhabricatorUser $viewer) {
+    $previous_viewer = $this->viewer;
+    $this->viewer = $viewer;
+    try {
+      $object = $this->getObject();
+      $document = $this->newAbstractDocument($object);
+      $this->buildAbstractDocument($document, $object);
+      return $document;
+    } finally {
+      $this->viewer = $previous_viewer;
+    }
   }
 
   abstract protected function buildAbstractDocument(

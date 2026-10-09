@@ -17,6 +17,12 @@ final class PhabricatorSearchApplicationSearchEngine
     $saved = new PhabricatorSavedQuery();
 
     $saved->setParameter('query', $request->getStr('query'));
+    $fields = array('title', 'body', 'comment');
+    if ($request->getBool('searchFieldsPresent')) {
+      $fields = array_values(array_intersect(
+        $fields, $request->getArr('searchFields')));
+    }
+    $saved->setParameter('searchFields', $fields);
     $saved->setParameter(
       'statuses',
       $this->readListFromRequest($request, 'statuses'));
@@ -140,6 +146,23 @@ final class PhabricatorSearchApplicationSearchEngine
           ->setLabel(pht('Query'))
           ->setName('query')
           ->setValue($saved->getParameter('query')))
+      ->appendControl(
+        id(new AphrontFormCheckboxControl())
+          ->setLabel(pht('Search In'))
+          ->addCheckbox('searchFields[]', 'title', pht('Title'),
+            in_array('title', $saved->getParameter('searchFields',
+              array('title', 'body', 'comment'))))
+          ->addCheckbox('searchFields[]', 'body', pht('Content'),
+            in_array('body', $saved->getParameter('searchFields',
+              array('title', 'body', 'comment'))))
+          ->addCheckbox('searchFields[]', 'comment', pht('Comments'),
+            in_array('comment', $saved->getParameter('searchFields',
+              array('title', 'body', 'comment')))))
+      ->appendChild(phutil_tag('input', array(
+        'type' => 'hidden',
+        'name' => 'searchFieldsPresent',
+        'value' => '1',
+      )))
       ->appendChild($status_control)
       ->appendControl($types_control)
       ->appendControl(
@@ -219,6 +242,11 @@ final class PhabricatorSearchApplicationSearchEngine
     foreach ($objects as $object) {
       $phid_type = phid_get_type($object->generatePHID());
       $type_map[$phid_type] = $object;
+    }
+
+    foreach (id(new PhabricatorSearchApplicationDocumentEngine())
+      ->getObjects() as $object) {
+      $type_map[phid_get_type($object->generatePHID())] = $object;
     }
 
     if ($viewer) {

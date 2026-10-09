@@ -27,6 +27,12 @@ final class PhabricatorFerretFulltextStorageEngine
   }
 
   public function executeSearch(PhabricatorSavedQuery $query) {
+    $this->fulltextTokens = array();
+    $query = clone $query;
+    $query->setParameter('query', Normalizer::normalize(
+      (string)$query->getParameter('query', ''), Normalizer::FORM_C));
+    $search_fields = $query->getParameter('searchFields',
+      array('title', 'body', 'comment'));
     $all_objects = id(new PhutilClassMapQuery())
       ->setAncestorClass(PhabricatorFerretInterface::class)
       ->execute();
@@ -56,6 +62,9 @@ final class PhabricatorFerretFulltextStorageEngine
     $type_results = array();
     $metadata = array();
     foreach ($type_map as $type => $spec) {
+      if (count($search_fields) != 3) {
+        continue;
+      }
       $engine = $spec['engine'];
       $object = $spec['object'];
 
@@ -115,8 +124,34 @@ final class PhabricatorFerretFulltextStorageEngine
     $metadata = msortv($metadata, 'getRelevanceSortVector');
     $list = array_select_keys($list, array_keys($metadata)) + $list;
 
-    $result_slice = array_slice($list, $offset, $limit, true);
-    return array_keys($result_slice);
+    $phids = array_keys($list);
+    $additional = id(new PhabricatorSearchApplicationContentQuery())
+      ->execute($query);
+    if (!$this->fulltextTokens) {
+      foreach (id(new PhutilSearchQueryCompiler())->setEnableFunctions(true)
+        ->newTokens($query->getParameter('query', '')) as $token) {
+        $this->fulltextTokens[] = id(new PhabricatorFulltextToken())
+          ->setToken($token);
+      }
+    }
+    // Keep a stable, complete application-index order across pages. Ferret
+    // provides fallback results for objects which have not been backfilled.
+    $table = new PhabricatorSearchApplicationDocument();
+    $indexed = array();
+    if ($phids) {
+      $indexed = queryfx_all($table->establishConnection('r'),
+        'SELECT objectPHID FROM %T WHERE objectPHID IN (%Ls)',
+        $table->getTableName(), $phids);
+      $indexed = array_fuse(ipull($indexed, 'objectPHID'));
+    }
+    $fallback = array();
+    foreach ($phids as $phid) {
+      if (!isset($indexed[$phid])) {
+        $fallback[] = $phid;
+      }
+    }
+    $phids = array_values(array_unique(array_merge($additional, $fallback)));
+    return array_slice($phids, $offset, $limit);
   }
 
   public function indexExists() {

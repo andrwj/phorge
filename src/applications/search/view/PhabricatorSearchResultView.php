@@ -41,7 +41,8 @@ final class PhabricatorSearchResultView extends AphrontView {
 
     $type_name = nonempty($handle->getTypeName(), pht('Document'));
 
-    $raw_title = $handle->getFullName();
+    $raw_title = Normalizer::normalize(
+      $handle->getFullName(), Normalizer::FORM_C);
     $title = $this->emboldenQuery($raw_title);
 
     $item = id(new PHUIObjectItemView())
@@ -97,7 +98,7 @@ final class PhabricatorSearchResultView extends AphrontView {
           $patterns[] = '(('.preg_quote($value).'))ui';
           break;
         case PhutilSearchQueryCompiler::OPERATOR_AND:
-          $patterns[] = '((?<=\W|^)('.preg_quote($value).')(?=\W|\z))ui';
+          $patterns[] = '(('.preg_quote($value).'))ui';
           break;
         default:
           // Don't highlight anything else, particularly "NOT".

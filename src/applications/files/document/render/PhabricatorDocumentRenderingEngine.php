@@ -252,6 +252,9 @@ abstract class PhabricatorDocumentRenderingEngine
   }
 
   private function newContentResponse($content) {
+    if ($this instanceof PhabricatorFileDocumentRenderingEngine) {
+      $content = phutil_tag_div('file-document-view', $content);
+    }
     $request = $this->getRequest();
     $viewer = $request->getViewer();
     $controller = $this->getController();

@@ -54,6 +54,7 @@ final class PhabricatorPasteViewController extends PhabricatorPasteController {
     $recommendation_view = $this->newDocumentRecommendationView($paste);
 
     $paste_view = id(new PHUITwoColumnView())
+      ->addClass('paste-document-view')
       ->setHeader($header)
       ->setSubheader($subheader)
       ->setMainColumn(

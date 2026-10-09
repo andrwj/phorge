@@ -14,9 +14,34 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     }
   }
 
+  public function testConfigValidation() {
+    $provider = new PhabricatorCustomUIConfigOptions();
+    $options = mpull($provider->getOptions(), null, 'getKey');
+    foreach (array(
+      array('ui.custom.paste.font-size', 16, true),
+      array('ui.custom.paste.font-size', 0, false),
+      array('ui.custom.files.font-size', 80, false),
+      array('ui.custom.files.font-size', null, true),
+      array('ui.custom.fonts.ui-family', '"Noto Sans KR", sans-serif', true),
+      array('ui.custom.fonts.ui-family', 'monospace; color:red', false),
+      array('ui.custom.workboard.control-pan', false, true),
+    ) as $case) {
+      list($key, $value, $expected) = $case;
+      $valid = true;
+      try {
+        $provider->validateOption($options[$key], $value);
+      } catch (Exception $ex) {
+        $valid = false;
+      }
+      $this->assertEqual($expected, $valid, $key);
+    }
+  }
+
   public function testRenderedFontSettings() {
     $env = PhabricatorEnv::beginScopedEnv();
     $env->overrideEnvConfig('ui.custom.fonts.ui-family', 'Arial');
+    $env->overrideEnvConfig('ui.custom.paste.font-size', 16);
+    $env->overrideEnvConfig('ui.custom.files.font-size', 18);
     $user = id(new PhabricatorUser())->setPHID('PHID-USER-fonttest')
       ->attachRawCacheData(array(
         PhabricatorUserPreferencesCacheType::KEY_PREFERENCES => phutil_json_encode(array('monospaced' => null, 'font-family-ui' => null))));
@@ -25,6 +50,8 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     $method = new ReflectionMethod($page, 'newCustomUIStyle');
     $html = (string)$method->invoke($page);
     $this->assertTrue(strpos($html, '--phabricator-font-ui: Arial;') !== false);
+    $this->assertTrue(strpos($html, 'font-size: 16px;') !== false);
+    $this->assertTrue(strpos($html, 'font-size: 18px;') !== false);
     $user = id(new PhabricatorUser())->setPHID('PHID-USER-fontoverride')
       ->attachRawCacheData(array(
         PhabricatorUserPreferencesCacheType::KEY_PREFERENCES => phutil_json_encode(array('monospaced' => '15px Monaco', 'font-family-ui' => 'Pretendard'))));
@@ -33,9 +60,11 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     $this->assertTrue(strpos($html, '--phabricator-font-ui: Pretendard;') !== false);
     $this->assertFalse(strpos($html, '--phabricator-font-code:') !== false);
     $env->overrideEnvConfig('ui.custom.fonts.enabled', false);
+    $env->overrideEnvConfig('ui.custom.document-font-size.enabled', false);
     $html = (string)$method->invoke($page);
     $this->assertFalse(strpos($html, '--phabricator-font-ui:') !== false);
     $this->assertFalse(strpos($html, '--phabricator-font-code:') !== false);
+    $this->assertFalse(strpos($html, 'font-size: 16px;') !== false);
   }
 
 }

@@ -432,6 +432,18 @@ final class PhabricatorStandardPageView extends PhabricatorBarePageView
         $custom_rules[] = ':root { --phabricator-font-ui: '.$value.'; }';
       }
     }
+    if (PhabricatorEnv::getEnvConfig('ui.custom.document-font-size.enabled')) {
+      $offset = (int)PhabricatorEnv::getEnvConfig(
+        'ui.custom.document-font-size.windows-offset');
+      foreach (array('paste', 'files') as $app) {
+        $size = (int)PhabricatorEnv::getEnvConfig('ui.custom.'.$app.'.font-size');
+        $class = ($app == 'files') ? 'file' : $app;
+        $selector = '.'.$class.'-document-view .phabricator-source-code-view';
+        $custom_rules[] = $selector.' { font-size: '.$size.'px; }';
+        $custom_rules[] = '.platform-windows '.$selector.
+          ' { font-size: '.($size + $offset).'px; }';
+      }
+    }
     return hsprintf('<style type="text/css">%s</style>',
       new PhutilSafeHTML(implode("\n", $custom_rules)));
   }

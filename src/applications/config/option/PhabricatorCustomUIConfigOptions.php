@@ -33,6 +33,14 @@ final class PhabricatorCustomUIConfigOptions
         'Enable custom font families and per-user font family preferences.'),
       'ui.custom.fonts.ui-family' => array('string', '',
         'Default interface font family list. User preferences take priority.'),
+      'ui.custom.document-font-size.enabled' => array('bool', true,
+        'Enable font size overrides in Paste and Files document views.'),
+      'ui.custom.paste.font-size' => array('int', 12,
+        'Paste document text size in pixels (8 to 72).'),
+      'ui.custom.files.font-size' => array('int', 12,
+        'Files document text size in pixels (8 to 72).'),
+      'ui.custom.document-font-size.windows-offset' => array('int', 1,
+        'Additional pixels for document text on Windows (0 to 10).'),
     );
     $options = array();
     foreach ($specs as $key => $spec) {
@@ -56,6 +64,9 @@ final class PhabricatorCustomUIConfigOptions
       }
     }
     $ranges = array(
+      'ui.custom.paste.font-size' => array(8, 72),
+      'ui.custom.files.font-size' => array(8, 72),
+      'ui.custom.document-font-size.windows-offset' => array(0, 10),
     );
     if (isset($ranges[$key])) {
       list($min, $max) = $ranges[$key];

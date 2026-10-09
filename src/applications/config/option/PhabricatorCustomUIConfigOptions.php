@@ -27,6 +27,8 @@ final class PhabricatorCustomUIConfigOptions
     $specs = array(
       'ui.custom.workboard.control-pan' => array('bool', true,
         'Enable Ctrl + mouse drag scrolling on Workboards.'),
+      'ui.custom.search.collapsible-filters' => array('bool', true,
+        'Collapse global advanced search filters by default.'),
     );
     $options = array();
     foreach ($specs as $key => $spec) {

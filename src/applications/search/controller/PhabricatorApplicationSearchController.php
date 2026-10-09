@@ -236,7 +236,15 @@ final class PhabricatorApplicationSearchController
       ->setHeader($header)
       ->addClass('application-search-results');
 
-    if ($run_query || $named_query) {
+    if ($engine instanceof PhabricatorSearchApplicationSearchEngine &&
+        PhabricatorEnv::getEnvConfig('ui.custom.search.collapsible-filters')) {
+      $box->setShowHide(
+        pht('Expand Search Filters'),
+        pht('Collapse Search Filters'),
+        $form,
+        $this->getApplicationURI('query/advanced/'),
+        (bool)$errors);
+    } else if ($run_query || $named_query) {
       $box->setShowHide(
         pht('Edit Query'),
         pht('Hide Query'),

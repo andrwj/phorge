@@ -34,6 +34,10 @@ final class PhabricatorConfigApplication extends PhabricatorApplication {
     return pht('Configure %s', PlatformSymbols::getPlatformServerName());
   }
 
+  public function getApplicationSearchDocumentTypes() {
+    return array(PhabricatorConfigConfigPHIDType::TYPECONST);
+  }
+
   public function getRoutes() {
     return array(
       '/config/' => array(

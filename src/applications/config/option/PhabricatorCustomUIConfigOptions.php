@@ -29,6 +29,8 @@ final class PhabricatorCustomUIConfigOptions
         'Dashboard numeric ID for the built-in Home item. Zero uses the built-in homepage. Explicit menu defaults take priority; inaccessible or archived dashboards fall back to the built-in homepage.'),
       'ui.custom.workboard.control-pan' => array('bool', true,
         'Enable Ctrl + mouse drag scrolling on Workboards.'),
+      'ui.custom.search.config-settings' => array('bool', true,
+        'Search config option metadata in global search and Settings. Available to administrators only; configuration values are never searched.'),
       'ui.custom.search.collapsible-filters' => array('bool', true,
         'Collapse global advanced search filters by default.'),
       'ui.custom.fonts.enabled' => array('bool', true,

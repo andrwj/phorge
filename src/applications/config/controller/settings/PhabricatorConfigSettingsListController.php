@@ -87,6 +87,35 @@ final class PhabricatorConfigSettingsListController
       unset($options[$key]);
     }
 
+    $search_form = null;
+    $search_error = null;
+    if (PhabricatorEnv::getEnvConfig('ui.custom.search.config-settings')) {
+      $search_text = $request->getStr('query');
+      $search_form = id(new AphrontFormView())
+        ->setUser($viewer)
+        ->setMethod('GET')
+        ->setAction($request->getPath())
+        ->appendControl(id(new AphrontFormTextControl())
+          ->setLabel(pht('Search Settings'))
+          ->setName('query')
+          ->setValue($search_text))
+        ->appendControl(id(new AphrontFormSubmitControl())
+          ->setValue(pht('Search')));
+      if (strlen(trim($search_text))) {
+        $saved = id(new PhabricatorSavedQuery())
+          ->setParameter('query', $search_text);
+        try {
+          $options = id(new PhabricatorConfigOptionSearch())
+            ->setViewer($viewer)
+            ->execute($saved, $options);
+        } catch (PhutilSearchQueryCompilerSyntaxException $ex) {
+          $options = array();
+          $search_error = id(new PHUIInfoView())
+            ->setErrors(array($ex->getMessage()));
+        }
+      }
+    }
+
     $list->setOptions($options);
 
     $header = $this->buildHeaderView($title);
@@ -97,7 +126,7 @@ final class PhabricatorConfigSettingsListController
     $content = id(new PHUITwoColumnView())
       ->setHeader($header)
       ->setSubheader($change_notice)
-      ->setFooter($list);
+      ->setFooter(array($search_form, $search_error, $list));
 
     $nav = $this->newNavigation($filter);
 

@@ -264,6 +264,11 @@ final class PhabricatorSearchApplicationSearchEngine
       }
     }
 
+    if ($viewer && $viewer->getIsAdmin() &&
+        PhabricatorEnv::getEnvConfig('ui.custom.search.config-settings')) {
+      $results[PhabricatorConfigConfigPHIDType::TYPECONST] = pht('Config Settings');
+    }
+
     asort($results);
 
     return $results;
@@ -329,8 +334,26 @@ final class PhabricatorSearchApplicationSearchEngine
     }
 
     $result = new PhabricatorApplicationSearchResultView();
-    $result->setContent($fulltext_view);
-    $result->setObjectList($list);
+    $settings = array();
+    if ($viewer->getIsAdmin() &&
+        PhabricatorEnv::getEnvConfig('ui.custom.search.config-settings')) {
+      $settings = id(new PhabricatorConfigOptionSearch())
+        ->setViewer($viewer)
+        ->execute($query, PhabricatorApplicationConfigOptions::loadAllOptions());
+    }
+    $settings_view = null;
+    if ($settings) {
+      $settings_list = id(new PhorgeConfigOptionListView())
+        ->setViewer($viewer)
+        ->setOptions($settings);
+      $settings_view = id(new PHUIObjectBoxView())
+        ->setHeaderText(pht('Config Settings'))
+        ->appendChild($settings_list);
+    }
+    $result->setContent(array($fulltext_view, $settings_view));
+    if ($results || !$settings) {
+      $result->setObjectList($list);
+    }
 
     return $result;
   }

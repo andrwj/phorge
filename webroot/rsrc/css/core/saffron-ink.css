@@ -80,3 +80,11 @@ body .phabricator-main-menu-brand .phabricator-wordmark {
 body .phabricator-main-menu-project-logo {
   filter: brightness(0);
 }
+
+:is(textarea, input[type="text"], input[type="password"], input[type="datetime"], input[type="datetime-local"], input[type="date"], input[type="month"], input[type="time"], input[type="week"], input[type="number"], input[type="email"], input[type="url"], input[type="search"], input[type="tel"], input[type="color"], div.jx-tokenizer-container):not(div.phabricator-main-menu-search-container, div.phabricator-main-menu-search-container *) {
+   background-color: #dddddd !important;
+}
+
+.phabricator-main-menu {
+   height: 60px !important;
+}

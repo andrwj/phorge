@@ -48,16 +48,3 @@ Config Settings 검색에는 실제 설정값·default·example 값을 포함하
 - 원본 테마의 [MIT license](resources/saffron-ink/LICENSE) 보존
 
 ![Saffron Ink 화면](resources/saffron-ink/screenshot/screenshot-saffron-ink.png)
-
-## 검증 상태
-
-- Task를 대상으로 NFC/NFD 입력, 영문 Title·Comment 부분검색, field 선택, pagination, anonymous 권한 filtering을 검증했습니다.
-- Search regression과 compiler·stemmer test, PHP syntax 검사 및 `git diff --check`를 통과했습니다.
-- Saffron Ink의 전체 CSS 변환과 Larger Font Size 재사용 및 기존 Custom UI regression을 포함한 관련 test 8개가 통과했습니다.
-- File·Ponder·Wiki의 댓글 indexing과 실제 browser에서 새 문서·댓글 작성/수정 후 검색 반영은 추가 확인이 필요합니다.
-
-## 유지보수
-
-- 진행 목록: [migration.md](../migration.md)
-- `stable` 업데이트 후 유지 절차: [SKILL.md](../.agents/skills/phorge-custom-migration/SKILL.md)
-- Git content search와 PHP compatibility fix의 일괄 이식은 적용 대상에서 제외합니다.

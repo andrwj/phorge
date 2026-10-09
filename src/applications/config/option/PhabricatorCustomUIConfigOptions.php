@@ -25,6 +25,8 @@ final class PhabricatorCustomUIConfigOptions
 
   public function getOptions() {
     $specs = array(
+      'ui.custom.home.default-dashboard' => array('int', 0,
+        'Dashboard numeric ID for the built-in Home item. Zero uses the built-in homepage. Explicit menu defaults take priority; inaccessible or archived dashboards fall back to the built-in homepage.'),
       'ui.custom.workboard.control-pan' => array('bool', true,
         'Enable Ctrl + mouse drag scrolling on Workboards.'),
       'ui.custom.search.collapsible-filters' => array('bool', true,
@@ -64,6 +66,10 @@ final class PhabricatorCustomUIConfigOptions
           !PhabricatorFontFamilySetting::isValidFontFamily($value)) {
         throw new PhabricatorConfigValidationException(pht('Enter a valid comma-separated font family list.'));
       }
+    }
+    if ($key === 'ui.custom.home.default-dashboard' && $value < 0) {
+      throw new PhabricatorConfigValidationException(
+        pht('Dashboard ID must be zero or a positive integer.'));
     }
     $ranges = array(
       'ui.custom.paste.font-size' => array(8, 72),

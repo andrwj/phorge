@@ -18,6 +18,10 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     $provider = new PhabricatorCustomUIConfigOptions();
     $options = mpull($provider->getOptions(), null, 'getKey');
     foreach (array(
+      array('ui.custom.home.default-dashboard', 123, true),
+      array('ui.custom.home.default-dashboard', 0, true),
+      array('ui.custom.home.default-dashboard', -1, false),
+      array('ui.custom.home.default-dashboard', 'D123', false),
       array('ui.custom.paste.font-size', 16, true),
       array('ui.custom.paste.font-size', 0, false),
       array('ui.custom.files.font-size', 80, false),
@@ -65,6 +69,19 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     $this->assertFalse(strpos($html, '--phabricator-font-ui:') !== false);
     $this->assertFalse(strpos($html, '--phabricator-font-code:') !== false);
     $this->assertFalse(strpos($html, 'font-size: 16px;') !== false);
+  }
+
+  public function testBuiltInHomeFallback() {
+    $env = PhabricatorEnv::beginScopedEnv();
+    $env->overrideEnvConfig('ui.custom.home.default-dashboard', 0);
+    $item = id(new PhabricatorHomeProfileMenuItem())
+      ->setViewer(new PhabricatorUser());
+    $view = $item->newPageContent(
+      new PhabricatorProfileMenuItemConfiguration());
+    $this->assertTrue($view instanceof PHUIHomeView);
+    $dashboard_item = new PhabricatorDashboardProfileMenuItem();
+    $this->assertTrue($dashboard_item->canMakeDefault(
+      new PhabricatorProfileMenuItemConfiguration()));
   }
 
   public function testPasteEmbedExpansion() {

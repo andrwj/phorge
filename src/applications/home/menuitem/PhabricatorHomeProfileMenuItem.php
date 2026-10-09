@@ -34,11 +34,26 @@ final class PhabricatorHomeProfileMenuItem
   }
 
   /**
-   * @return PHUIHomeView
+   * @return PHUIHomeView|PHUIBoxView
    */
   public function newPageContent(
     PhabricatorProfileMenuItemConfiguration $config) {
     $viewer = $this->getViewer();
+
+    $dashboard_id = PhabricatorEnv::getEnvConfig(
+      'ui.custom.home.default-dashboard');
+    if ($dashboard_id) {
+      $dashboard = id(new PhabricatorDashboardQuery())
+        ->setViewer($viewer)
+        ->withIDs(array($dashboard_id))
+        ->executeOne();
+      if ($dashboard && !$dashboard->isArchived()) {
+        return id(new PhabricatorDashboardRenderingEngine())
+          ->setViewer($viewer)
+          ->setDashboard($dashboard)
+          ->renderDashboard();
+      }
+    }
 
     return id(new PHUIHomeView())
       ->setViewer($viewer);

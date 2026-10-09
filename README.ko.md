@@ -21,6 +21,7 @@
 | --- | --- | --- |
 | Diffusion default branch | Git fallback branch 지정, repository별 override 유지 | `repository.default-git-branch` |
 | Home dashboard | built-in Home에 custom dashboard 표시, 없는·archived·권한 없는 dashboard는 기본 Home으로 fallback | `ui.custom.home.default-dashboard` |
+| Calendar Day View | 빈 시간대 Drag로 새 event의 Start·End 선택, 기본 5분 | `ui.custom.calendar.drag-select`, `ui.custom.calendar.drag-step-minutes` |
 | Workboard | Ctrl + mouse drag scrolling | `ui.custom.workboard.control-pan` |
 | Advanced search UI | filter 접기·펼치기, 기본 collapsed | `ui.custom.search.collapsible-filters` |
 | Interface font | 사용자별 font family, 기존 Monospaced Font 유지 | `ui.custom.fonts.enabled`, `ui.custom.fonts.ui-family` |

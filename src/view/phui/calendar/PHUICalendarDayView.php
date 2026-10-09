@@ -55,11 +55,22 @@ final class PHUICalendarDayView extends AphrontView {
     $viewer = $this->getUser();
 
     $hours = $this->getHoursOfDay();
+    $drag_step = PhabricatorEnv::getEnvConfig(
+      'ui.custom.calendar.drag-step-minutes');
     $js_hours = array();
     $js_today_events = array();
 
     foreach ($hours as $hour) {
+      $slots = array();
+      for ($minute = 0; $minute <= 60; $minute += $drag_step) {
+        $epoch = (int)$hour->format('U') + $minute * 60;
+        $slots[] = array(
+          'epoch' => $epoch,
+          'label' => phabricator_time($epoch, $viewer),
+        );
+      }
       $js_hours[] = array(
+        'slots' => $slots,
         'hour' => $hour->format('G'),
         'displayTime' => phabricator_time($hour->format('U'), $viewer),
       );
@@ -178,6 +189,9 @@ final class PHUICalendarDayView extends AphrontView {
         'firstEventHour' => $first_event_hour->format('G'),
         'firstEventHourEpoch' => $first_event_hour->format('U'),
         'tableID' => $table_id,
+        'dragSelect' => PhabricatorEnv::getEnvConfig(
+          'ui.custom.calendar.drag-select'),
+        'dragStepMinutes' => $drag_step,
       ));
 
     $table_box = id(new PHUIObjectBoxView())

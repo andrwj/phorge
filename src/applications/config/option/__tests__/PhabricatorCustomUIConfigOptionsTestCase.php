@@ -18,6 +18,15 @@ final class PhabricatorCustomUIConfigOptionsTestCase extends PhabricatorTestCase
     $provider = new PhabricatorCustomUIConfigOptions();
     $options = mpull($provider->getOptions(), null, 'getKey');
     foreach (array(
+      array('ui.custom.calendar.drag-step-minutes', 5, true),
+      array('ui.custom.calendar.drag-step-minutes', 15, true),
+      array('ui.custom.calendar.drag-step-minutes', 60, true),
+      array('ui.custom.calendar.drag-step-minutes', null, true),
+      array('ui.custom.calendar.drag-step-minutes', 0, false),
+      array('ui.custom.calendar.drag-step-minutes', -5, false),
+      array('ui.custom.calendar.drag-step-minutes', 7, false),
+      array('ui.custom.calendar.drag-step-minutes', 90, false),
+      array('ui.custom.calendar.drag-step-minutes', 2.5, false),
       array('ui.custom.home.default-dashboard', 123, true),
       array('ui.custom.home.default-dashboard', 0, true),
       array('ui.custom.home.default-dashboard', -1, false),

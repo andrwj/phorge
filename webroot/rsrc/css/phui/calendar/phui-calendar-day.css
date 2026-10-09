@@ -109,3 +109,26 @@ div.phui-calendar-day-event.all-day {
   float: right;
   margin: 8px 8px 0 0;
 }
+
+.phui-calendar-drag-selection {
+  position: absolute;
+  left: 69px;
+  right: 0;
+  box-sizing: border-box;
+  border: 1px solid {$blueborder};
+  background: rgba({$alphablue}, .18);
+  color: {$blacktext};
+  font-weight: bold;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+}
+
+.phui-calendar-drag-selection-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 4px;
+  background: {$page.content};
+  white-space: nowrap;
+}

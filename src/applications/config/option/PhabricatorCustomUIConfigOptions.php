@@ -25,6 +25,10 @@ final class PhabricatorCustomUIConfigOptions
 
   public function getOptions() {
     $specs = array(
+      'ui.custom.calendar.drag-select' => array('bool', true,
+        'Enable dragging empty Day View time slots to prefill a new event.'),
+      'ui.custom.calendar.drag-step-minutes' => array('int', 5,
+        'Calendar drag interval in minutes. Must be a positive divisor of 60.'),
       'ui.custom.home.default-dashboard' => array('int', 0,
         'Dashboard numeric ID for the built-in Home item. Zero uses the built-in homepage. Explicit menu defaults take priority; inaccessible or archived dashboards fall back to the built-in homepage.'),
       'ui.custom.theme.saffron-ink' => array('bool', true,
@@ -74,6 +78,11 @@ final class PhabricatorCustomUIConfigOptions
     if ($key === 'ui.custom.home.default-dashboard' && $value < 0) {
       throw new PhabricatorConfigValidationException(
         pht('Dashboard ID must be zero or a positive integer.'));
+    }
+    if ($key === 'ui.custom.calendar.drag-step-minutes' &&
+        ($value < 1 || $value > 60 || 60 % $value !== 0)) {
+      throw new PhabricatorConfigValidationException(
+        pht('Calendar drag interval must be a positive divisor of 60.'));
     }
     $ranges = array(
       'ui.custom.paste.font-size' => array(8, 72),

@@ -76,6 +76,8 @@ JX.behavior('project-boards', function(config, statics) {
       .start();
   }
 
+  statics.workboard.setControlPanEnabled(config.controlPanEnabled);
+
   var board_phid = config.projectPHID;
   var board_node = JX.$(config.boardID);
 

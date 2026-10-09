@@ -314,6 +314,8 @@ final class PhabricatorProjectBoardViewController
     }
 
     $behavior_config = array(
+      'controlPanEnabled' => PhabricatorEnv::getEnvConfig(
+        'ui.custom.workboard.control-pan'),
       'moveURI' => $this->getApplicationURI('move/'.$project->getID().'/'),
       'uploadURI' => '/file/dropupload/',
       'coverURI' => $this->getApplicationURI('cover/'),

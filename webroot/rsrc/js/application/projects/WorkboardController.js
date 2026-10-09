@@ -26,7 +26,8 @@ JX.install('WorkboardController', {
     coverURI: null,
     moveURI: null,
     reloadURI: null,
-    chunkThreshold: null
+    chunkThreshold: null,
+    controlPanEnabled: false
   },
 
   members: {
@@ -35,6 +36,7 @@ JX.install('WorkboardController', {
     _panOrigin: null,
     _panNode: null,
     _panX: null,
+    _panSuppressClick: false,
 
     start: function() {
       this._setupCoverImageHandlers();
@@ -104,6 +106,8 @@ JX.install('WorkboardController', {
     },
 
     _setupPanHandlers: function() {
+      this._setupControlPanHandlers();
+
       var mousedown = JX.bind(this, this._onpanmousedown);
       var mousemove = JX.bind(this, this._onpanmousemove);
       var mouseup = JX.bind(this, this._onpanmouseup);
@@ -111,6 +115,96 @@ JX.install('WorkboardController', {
       JX.Stratcom.listen('mousedown', 'workboard-shadow', mousedown);
       JX.Stratcom.listen('mousemove', null, mousemove);
       JX.Stratcom.listen('mouseup', null, mouseup);
+      JX.Stratcom.listen('click', 'workboard-shadow', JX.bind(this, function(e) {
+        if (this._panSuppressClick) {
+          this._panSuppressClick = false;
+          e.kill();
+        }
+      }));
+    },
+
+    _setupControlPanHandlers: function() {
+      var controller = this;
+      var pan = null;
+      var suppress_click = false;
+      var find_board = function(node) {
+        while (node && node !== document) {
+          if (node.nodeType === 1 &&
+              JX.Stratcom.hasSigil(node, 'workboard-shadow')) {
+            return node;
+          }
+          node = node.parentNode;
+        }
+        return null;
+      };
+      var stop = function(e) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+      };
+
+      // Capture before card dragging and link handlers. On macOS, Control
+      // clicking may be reported as a secondary mouse button.
+      document.addEventListener('pointerdown', function(e) {
+        suppress_click = false;
+        var board = find_board(e.target);
+        if (!controller.getControlPanEnabled() || !board || !e.ctrlKey || e.pointerType !== 'mouse' ||
+            (e.button !== 0 && e.button !== 2)) {
+          return;
+        }
+
+        pan = {
+          node: board,
+          pointer: e.pointerId,
+          origin: e.clientX,
+          scroll: board.scrollLeft
+        };
+        board.setPointerCapture(e.pointerId);
+        stop(e);
+      }, true);
+
+      document.addEventListener('pointermove', function(e) {
+        if (!pan || pan.pointer !== e.pointerId) {
+          return;
+        }
+        var distance = pan.origin - e.clientX;
+        if (Math.abs(distance) > 3) {
+          suppress_click = true;
+        }
+        pan.node.scrollLeft = pan.scroll + distance;
+        stop(e);
+      }, true);
+
+      var finish = function(e) {
+        if (!pan || pan.pointer !== e.pointerId) {
+          return;
+        }
+        var board = pan.node;
+        pan = null;
+        if (board.hasPointerCapture(e.pointerId)) {
+          board.releasePointerCapture(e.pointerId);
+        }
+        stop(e);
+      };
+      document.addEventListener('pointerup', finish, true);
+      document.addEventListener('pointercancel', finish, true);
+      document.addEventListener('lostpointercapture', function(e) {
+        if (pan && pan.pointer === e.pointerId) {
+          pan = null;
+        }
+      }, true);
+
+      document.addEventListener('contextmenu', function(e) {
+        if (controller.getControlPanEnabled() &&
+            find_board(e.target) && (e.ctrlKey || pan || suppress_click)) {
+          stop(e);
+        }
+      }, true);
+      document.addEventListener('click', function(e) {
+        if (suppress_click && find_board(e.target)) {
+          suppress_click = false;
+          stop(e);
+        }
+      }, true);
     },
 
     _onpanmousedown: function(e) {
@@ -118,11 +212,17 @@ JX.install('WorkboardController', {
         return;
       }
 
-      if (e.getNode('workpanel')) {
+      var raw = e.getRawEvent();
+      var control_pan = this.getControlPanEnabled() &&
+        raw.ctrlKey && raw.button === 0;
+
+      this._panSuppressClick = false;
+
+      if (!control_pan && e.getNode('workpanel')) {
         return;
       }
 
-      if (JX.Stratcom.pass()) {
+      if (!control_pan && JX.Stratcom.pass()) {
         return;
       }
 
@@ -138,12 +238,23 @@ JX.install('WorkboardController', {
         return;
       }
 
+      if (e.getRawEvent().buttons === 0) {
+        this._onpanmouseup();
+        return;
+      }
+
+      e.kill();
       var cursor = JX.$V(e);
+      if (Math.abs(this._panOrigin.x - cursor.x) > 3) {
+        this._panSuppressClick = true;
+      }
       this._panNode.scrollLeft = this._panX + (this._panOrigin.x - cursor.x);
     },
 
     _onpanmouseup: function() {
       this._panOrigin = null;
+      this._panNode = null;
+      this._panX = null;
     },
 
     _setupEditHandlers: function() {

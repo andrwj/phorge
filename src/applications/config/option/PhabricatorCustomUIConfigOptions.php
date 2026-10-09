@@ -27,6 +27,8 @@ final class PhabricatorCustomUIConfigOptions
     $specs = array(
       'ui.custom.home.default-dashboard' => array('int', 0,
         'Dashboard numeric ID for the built-in Home item. Zero uses the built-in homepage. Explicit menu defaults take priority; inaccessible or archived dashboards fall back to the built-in homepage.'),
+      'ui.custom.theme.saffron-ink' => array('bool', true,
+        'Offer the Saffron Ink accessibility theme with the existing larger font sizes.'),
       'ui.custom.workboard.control-pan' => array('bool', true,
         'Enable Ctrl + mouse drag scrolling on Workboards.'),
       'ui.custom.search.config-settings' => array('bool', true,

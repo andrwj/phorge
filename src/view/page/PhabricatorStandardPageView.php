@@ -236,6 +236,12 @@ final class PhabricatorStandardPageView extends PhabricatorBarePageView
     require_celerity_resource('conpherence-durable-column-view');
     require_celerity_resource('font-lato');
 
+    if ($request->getViewer()->getUserSetting(
+          PhabricatorAccessibilitySetting::SETTINGKEY) ===
+        CeleritySaffronInkPostprocessor::POSTPROCESSOR_KEY) {
+      require_celerity_resource('saffron-ink-css');
+    }
+
     Javelin::initBehavior('workflow', array());
 
     $user = $request->getUser();

@@ -1,0 +1,82 @@
+/**
+ * @provides saffron-ink-css
+ */
+
+/* Editor and terminal cursor foreground from the original Saffron Ink theme.
+ * Native insertion carets have no separate background color. */
+body {
+  caret-color: #d73a49;
+}
+
+input, textarea, [contenteditable] {
+  caret-color: #d73a49;
+}
+
+::selection {
+  color: #000000;
+  background: #ffd400;
+}
+
+input:focus, textarea:focus, select:focus,
+[contenteditable]:focus, div.jx-tokenizer-container-focused {
+  border-color: #8a6d24;
+  outline-color: #8a6d24;
+  box-shadow: 0 0 1pt 1pt #8a6d244d inset;
+}
+
+/* These surfaces use literal white in upstream styles. */
+.remarkup-code-block, .remarkup-assist-textarea {
+  background-color: #eddfb7;
+}
+
+/* Panel borders use a distinct color without changing shared border tokens. */
+body .phui-box-border.phui-object-box {
+  border-color: rgb(44, 62, 80);
+}
+
+/* Override the separate header color theme only for Saffron Ink. */
+body[class] div.phabricator-main-menu-background {
+  background: #eddfb7;
+  color: #000000;
+}
+
+body[class] .phabricator-main-menu-background a,
+body[class] .phabricator-main-menu-background a .phui-icon-view,
+body[class] .phabricator-main-menu-background .caret {
+  color: #000000;
+}
+
+body[class] .phabricator-main-menu-background a:hover,
+body[class] .phabricator-main-menu-background a:hover .phui-icon-view,
+body[class] .phabricator-main-menu-background a:hover .caret {
+  color: #d73a49;
+}
+
+body[class] .phabricator-main-menu-background .alert-unread .phui-icon-view,
+body[class] .phabricator-main-menu-background .message-unread .phui-icon-view,
+body[class] .phabricator-main-menu-background .setup-unread .phui-icon-view,
+body[class] .phabricator-main-menu-background .phabricator-main-menu-alert-count,
+body[class] .phabricator-main-menu-background .phabricator-main-menu-message-count,
+body[class] .phabricator-main-menu-background .phabricator-main-menu-setup-count {
+  color: #d73a49;
+}
+
+body[class] .phabricator-main-menu-background .phabricator-core-login-button {
+  border-color: #8a6d24;
+}
+
+/* Keep every brand label and icon readable, including hover states. */
+body .phabricator-main-menu-brand,
+body .phabricator-main-menu-brand * {
+  color: rgb(44, 62, 80) !important;
+}
+
+body .phabricator-main-menu-brand .phabricator-wordmark {
+  color: #000000 !important;
+  font-weight: 900;
+}
+
+/* The source logo is white on transparency, not a white background. */
+body .phabricator-main-menu-project-logo {
+  filter: brightness(0);
+}

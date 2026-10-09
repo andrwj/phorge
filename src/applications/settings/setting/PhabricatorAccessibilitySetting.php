@@ -30,6 +30,10 @@ final class PhabricatorAccessibilitySetting
   protected function getSelectOptions() {
     $postprocessor_map = CelerityPostprocessor::getAllPostprocessors();
 
+    if (!PhabricatorEnv::getEnvConfig('ui.custom.theme.saffron-ink')) {
+      unset($postprocessor_map[CeleritySaffronInkPostprocessor::POSTPROCESSOR_KEY]);
+    }
+
     $postprocessor_map = mpull($postprocessor_map, 'getPostprocessorName');
     asort($postprocessor_map);
 
